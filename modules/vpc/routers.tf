@@ -22,6 +22,17 @@ resource "aws_route_table" "this-private" {
     }
 }
 
+resource "aws_route" "this-route-private" {
+    route_table_id         = "${aws_route_table.this-private.id}"
+    destination_cidr_block = "0.0.0.0/0"
+    network_interface_id   = "${aws_network_interface.this.id}"
+}
+
+resource "aws_eip_association" "this" {
+    instance_id   = "${aws_instance.this.id}"
+    allocation_id = "${aws_eip.this.id}"
+}
+
 resource "aws_route_table_association" "this-public" {
     count          = "${length(var.public_subnets)}"
     subnet_id      = "${element(aws_subnet.this-public.*.id, count.index)}"
